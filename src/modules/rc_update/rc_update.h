@@ -62,7 +62,7 @@
 
 using namespace time_literals;
 
-namespace RCUpdate
+namespace rc_update
 {
 
 /**
@@ -243,4 +243,4 @@ private:
 		(ParamInt<px4::params::RC_CHAN_CNT>) _param_rc_chan_cnt
 	)
 };
-} /* namespace RCUpdate */
+} /* namespace rc_update */
