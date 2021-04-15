@@ -850,6 +850,15 @@ Commander::handle_command(const vehicle_command_s &cmd)
 				// Arm is forced (checks skipped) when param2 is set to a magic number.
 				const bool forced = (static_cast<int>(roundf(cmd.param2)) == 21196);
 
+				const bool cmd_from_manual_stick = (static_cast<int>(roundf(cmd.param3)) == 1);
+				const bool cmd_from_io = (static_cast<int>(roundf(cmd.param3)) == 1234);
+
+				if (cmd_from_manual_stick && !_vehicle_control_mode.flag_control_manual_enabled) {
+					mavlink_log_critical(&_mavlink_log_pub, "Not arming! Switch to a manual mode first");
+					cmd_result = vehicle_command_s::VEHICLE_CMD_RESULT_DENIED;
+					break;
+				}
+
 				if (!forced) {
 					if (!(_land_detector.landed || _land_detector.maybe_landed) && !is_ground_rover(_status)) {
 						if (cmd_arms) {
@@ -868,8 +877,6 @@ Commander::handle_command(const vehicle_command_s &cmd)
 						break;
 					}
 
-					const bool cmd_from_io = (static_cast<int>(roundf(cmd.param3)) == 1234);
-
 					// Flick to in-air restore first if this comes from an onboard system and from IO
 					if (cmd.source_system == _status.system_id && cmd.source_component == _status.component_id
 					    && cmd_from_io && cmd_arms) {
@@ -884,7 +891,11 @@ Commander::handle_command(const vehicle_command_s &cmd)
 						arming_res = arm(arm_disarm_reason_t::COMMAND_EXTERNAL);
 
 					} else {
-						arming_res = arm(arm_disarm_reason_t::COMMAND_INTERNAL, !forced);
+						if (cmd_from_manual_stick) {
+							arming_res = arm(arm_disarm_reason_t::RC_STICK, !forced);
+						} else {
+							arming_res = arm(arm_disarm_reason_t::COMMAND_INTERNAL, !forced);
+						}
 					}
 
 				} else {
@@ -892,7 +903,12 @@ Commander::handle_command(const vehicle_command_s &cmd)
 						arming_res = disarm(arm_disarm_reason_t::COMMAND_EXTERNAL);
 
 					} else {
-						arming_res = disarm(arm_disarm_reason_t::COMMAND_INTERNAL);
+						if (cmd_from_manual_stick) {
+							arming_res = disarm(arm_disarm_reason_t::RC_STICK);
+						} else {
+							arming_res = disarm(arm_disarm_reason_t::COMMAND_INTERNAL);
+						}
+
 					}
 				}
 
@@ -2254,24 +2270,6 @@ Commander::run()
 			}
 
 			_status.rc_signal_lost = false;
-
-			const bool rc_arming_enabled = (_status.rc_input_mode != vehicle_status_s::RC_IN_MODE_OFF);
-
-			if (rc_arming_enabled) {
-				if (_manual_control.wantsDisarm(_vehicle_control_mode, _status, _manual_control_switches, _land_detector.landed)) {
-					disarm(arm_disarm_reason_t::RC_STICK);
-				}
-
-				if (_manual_control.wantsArm(_vehicle_control_mode, _status, _manual_control_switches, _land_detector.landed)) {
-					if (_vehicle_control_mode.flag_control_manual_enabled) {
-						arm(arm_disarm_reason_t::RC_STICK);
-
-					} else {
-						mavlink_log_critical(&_mavlink_log_pub, "Not arming! Switch to a manual mode first");
-						tune_negative(true);
-					}
-				}
-			}
 
 			// abort autonomous mode and switch to position mode if sticks are moved significantly
 			if ((_status.vehicle_type == vehicle_status_s::VEHICLE_TYPE_ROTARY_WING)
