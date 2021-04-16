@@ -2936,13 +2936,8 @@ Commander::set_main_state_rc()
 	bool should_evaluate_rc_mode_switch =
 		(_last_manual_control_switches.offboard_switch != _manual_control_switches.offboard_switch)
 		|| (_last_manual_control_switches.return_switch != _manual_control_switches.return_switch)
-		|| (_last_manual_control_switches.mode_switch != _manual_control_switches.mode_switch)
-		|| (_last_manual_control_switches.acro_switch != _manual_control_switches.acro_switch)
-		|| (_last_manual_control_switches.posctl_switch != _manual_control_switches.posctl_switch)
 		|| (_last_manual_control_switches.loiter_switch != _manual_control_switches.loiter_switch)
-		|| (_last_manual_control_switches.mode_slot != _manual_control_switches.mode_slot)
-		|| (_last_manual_control_switches.stab_switch != _manual_control_switches.stab_switch)
-		|| (_last_manual_control_switches.man_switch != _manual_control_switches.man_switch);
+		|| (_last_manual_control_switches.mode_slot != _manual_control_switches.mode_slot);
 
 
 	if (_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED) {
@@ -3039,83 +3034,6 @@ Commander::set_main_state_rc()
 		}
 
 		return res;
-
-	} else if (_manual_control_switches.mode_switch != manual_control_switches_s::SWITCH_POS_NONE) {
-		/* offboard and RTL switches off or denied, check main mode switch */
-		switch (_manual_control_switches.mode_switch) {
-		case manual_control_switches_s::SWITCH_POS_NONE:
-			res = TRANSITION_NOT_CHANGED;
-			break;
-
-		case manual_control_switches_s::SWITCH_POS_OFF:		// MANUAL
-			if (_manual_control_switches.stab_switch == manual_control_switches_s::SWITCH_POS_NONE &&
-			    _manual_control_switches.man_switch == manual_control_switches_s::SWITCH_POS_NONE) {
-				/*
-				 * Legacy mode:
-				 * Acro switch being used as stabilized switch in FW.
-				 */
-				if (_manual_control_switches.acro_switch == manual_control_switches_s::SWITCH_POS_ON) {
-					/* manual mode is stabilized already for multirotors, so switch to acro
-					 * for any non-manual mode
-					 */
-					if (_status.vehicle_type == vehicle_status_s::VEHICLE_TYPE_ROTARY_WING && !_status.is_vtol) {
-						res = main_state_transition(_status, commander_state_s::MAIN_STATE_ACRO, _status_flags, _internal_state);
-
-					} else if (_status.vehicle_type == vehicle_status_s::VEHICLE_TYPE_FIXED_WING) {
-						res = main_state_transition(_status, commander_state_s::MAIN_STATE_STAB, _status_flags, _internal_state);
-
-					} else {
-						res = main_state_transition(_status, commander_state_s::MAIN_STATE_MANUAL, _status_flags, _internal_state);
-					}
-
-				} else {
-					res = main_state_transition(_status, commander_state_s::MAIN_STATE_MANUAL, _status_flags, _internal_state);
-				}
-
-			} else {
-				/* New mode:
-				 * - Acro is Acro
-				 * - Manual is not default anymore when the manual switch is assigned
-				 */
-				if (_manual_control_switches.man_switch == manual_control_switches_s::SWITCH_POS_ON) {
-					res = main_state_transition(_status, commander_state_s::MAIN_STATE_MANUAL, _status_flags, _internal_state);
-
-				} else if (_manual_control_switches.acro_switch == manual_control_switches_s::SWITCH_POS_ON) {
-					res = main_state_transition(_status, commander_state_s::MAIN_STATE_ACRO, _status_flags, _internal_state);
-
-				} else if (_manual_control_switches.stab_switch == manual_control_switches_s::SWITCH_POS_ON) {
-					res = main_state_transition(_status, commander_state_s::MAIN_STATE_STAB, _status_flags, _internal_state);
-
-				} else if (_manual_control_switches.man_switch == manual_control_switches_s::SWITCH_POS_NONE) {
-					// default to MANUAL when no manual switch is set
-					res = main_state_transition(_status, commander_state_s::MAIN_STATE_MANUAL, _status_flags, _internal_state);
-
-				} else {
-					// default to STAB when the manual switch is assigned (but off)
-					res = main_state_transition(_status, commander_state_s::MAIN_STATE_STAB, _status_flags, _internal_state);
-				}
-			}
-
-			// TRANSITION_DENIED is not possible here
-			break;
-
-		case manual_control_switches_s::SWITCH_POS_MIDDLE:		// ASSIST
-			if (_manual_control_switches.posctl_switch == manual_control_switches_s::SWITCH_POS_ON) {
-				res = try_mode_change(commander_state_s::MAIN_STATE_POSCTL);
-
-			} else {
-				res = try_mode_change(commander_state_s::MAIN_STATE_ALTCTL);
-			}
-
-			break;
-
-		case manual_control_switches_s::SWITCH_POS_ON:		// AUTO
-			res = try_mode_change(commander_state_s::MAIN_STATE_AUTO_MISSION);
-			break;
-
-		default:
-			break;
-		}
 
 	}
 

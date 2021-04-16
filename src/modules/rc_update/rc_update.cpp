@@ -48,18 +48,13 @@ namespace rc_update
 static bool operator ==(const manual_control_switches_s &a, const manual_control_switches_s &b)
 {
 	return (a.mode_slot == b.mode_slot &&
-		a.mode_switch == b.mode_switch &&
 		a.return_switch == b.return_switch &&
-		a.posctl_switch == b.posctl_switch &&
-		a.loiter_switch == b.loiter_switch &&
-		a.acro_switch == b.acro_switch &&
 		a.offboard_switch == b.offboard_switch &&
+		a.loiter_switch == b.loiter_switch &&
 		a.kill_switch == b.kill_switch &&
 		a.arm_switch == b.arm_switch &&
 		a.transition_switch == b.transition_switch &&
-		a.gear_switch == b.gear_switch &&
-		a.stab_switch == b.stab_switch &&
-		a.man_switch == b.man_switch);
+		a.gear_switch == b.gear_switch);
 }
 
 static bool operator !=(const manual_control_switches_s &a, const manual_control_switches_s &b) { return !(a == b); }
@@ -547,16 +542,6 @@ void RCUpdate::UpdateManualSwitches(const hrt_abstime &timestamp_sample)
 		if (switches.mode_slot > num_slots) {
 			switches.mode_slot = num_slots;
 		}
-
-	} else if (_param_rc_map_mode_sw.get() > 0) {
-		switches.mode_switch = get_rc_sw3pos_position(rc_channels_s::FUNCTION_MODE,
-				       _param_rc_auto_th.get(), _param_rc_assist_th.get());
-
-		// only used with legacy mode switch
-		switches.man_switch       = get_rc_sw2pos_position(rc_channels_s::FUNCTION_MAN,       _param_rc_man_th.get());
-		switches.acro_switch      = get_rc_sw2pos_position(rc_channels_s::FUNCTION_ACRO,      _param_rc_acro_th.get());
-		switches.stab_switch      = get_rc_sw2pos_position(rc_channels_s::FUNCTION_STAB,      _param_rc_stab_th.get());
-		switches.posctl_switch    = get_rc_sw2pos_position(rc_channels_s::FUNCTION_POSCTL,    _param_rc_posctl_th.get());
 	}
 
 	switches.return_switch     = get_rc_sw2pos_position(rc_channels_s::FUNCTION_RETURN,     _param_rc_return_th.get());
