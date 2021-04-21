@@ -125,6 +125,7 @@ public:
 	void stop();
 
 	void print_detailed_rx_stats() const;
+	static void *start_helper(void *context);
 
 private:
 	static void *start_trampoline(void *context);
@@ -211,11 +212,6 @@ private:
 	 */
 	int set_message_interval(int msgId, float interval, int data_rate = -1);
 	void get_message_interval(int msgId);
-
-	/**
-	 * Decode a switch position from a bitfield and state.
-	 */
-	int decode_switch_pos_n(uint16_t buttons, unsigned sw);
 
 	bool evaluate_target_ok(int command, int target_system, int target_component);
 
@@ -337,10 +333,6 @@ private:
 	PX4Barometer *_px4_baro{nullptr};
 	PX4Gyroscope *_px4_gyro{nullptr};
 	PX4Magnetometer *_px4_mag{nullptr};
-
-	static constexpr unsigned int	MOM_SWITCH_COUNT{8};
-	uint8_t				_mom_switch_pos[MOM_SWITCH_COUNT] {};
-	uint16_t			_mom_switch_state{0};
 
 	hrt_abstime			_last_utm_global_pos_com{0};
 
