@@ -65,7 +65,7 @@ UavcanNode::UavcanNode(CanardInterface *interface, uint32_t node_id) :
 	uavcan_allocator = o1heapInit(_uavcan_heap, HeapSize, nullptr, nullptr);
 
 	if (uavcan_allocator == nullptr) {
-		PX4_ERR("o1heapInit failed with size %d", HeapSize);
+		PX4_ERR("o1heapInit failed with size %u", HeapSize);
 	}
 
 	_canard_instance = canardInit(&memAllocate, &memFree);
@@ -287,7 +287,7 @@ void UavcanNode::Run()
 			// It is possible to statically prove that an out-of-memory will never occur for a given application if
 			// the heap is sized correctly; for background, refer to the Robson's Proof and the documentation for O1Heap.
 			// Reception of an invalid frame is NOT an error.
-			PX4_ERR("Receive error %d\n", result);
+			PX4_ERR("Receive error %" PRId32" \n", result);
 
 		} else if (result == 1) {
 			// A transfer has been received, process it.
@@ -380,7 +380,7 @@ extern "C" __EXPORT int uavcan_v1_main(int argc, char *argv[])
 		param_get(param_find("UAVCAN_V1_ID"), &node_id);
 
 		// Start
-		PX4_INFO("Node ID %u, bitrate %u", node_id, bitrate);
+		PX4_INFO("Node ID %" PRIu32 ", bitrate %" PRIu32, node_id, bitrate);
 		return UavcanNode::start(node_id, bitrate);
 	}
 
@@ -435,7 +435,7 @@ void UavcanNode::sendHeartbeat()
 			// An error has occurred: either an argument is invalid or we've ran out of memory.
 			// It is possible to statically prove that an out-of-memory will never occur for a given application if the
 			// heap is sized correctly; for background, refer to the Robson's Proof and the documentation for O1Heap.
-			PX4_ERR("Heartbeat transmit error %d", result);
+			PX4_ERR("Heartbeat transmit error %" PRId32 "", result);
 		}
 
 		_uavcan_node_heartbeat_last = transfer.timestamp_usec;
@@ -444,7 +444,7 @@ void UavcanNode::sendHeartbeat()
 
 int UavcanNode::handleUORBSensorGPS(const CanardTransfer &receive)
 {
-	PX4_INFO("NodeID %i GPS sensor msg", receive.remote_node_id);
+	PX4_INFO("NodeID %" PRIu16 " GPS sensor msg", receive.remote_node_id);
 
 	sensor_gps_s *gps_msg = (sensor_gps_s *)receive.payload;
 
