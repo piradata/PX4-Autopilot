@@ -378,8 +378,23 @@ MavlinkReceiver::handle_message_command_long(mavlink_message_t *msg)
 	vcmd.param2 = cmd_mavlink.param2;
 	vcmd.param3 = cmd_mavlink.param3;
 	vcmd.param4 = cmd_mavlink.param4;
-	vcmd.param5 = (double)cmd_mavlink.param5;
-	vcmd.param6 = (double)cmd_mavlink.param6;
+
+	const float before_int32_max = nextafterf((float)INT32_MAX, 0.0f);
+	const float after_int32_max = nextafterf((float)INT32_MAX, (float)INFINITY);
+
+	if (cmd_mavlink.param5 >= before_int32_max && cmd_mavlink.param5 <= after_int32_max &&
+	    cmd_mavlink.param6 >= before_int32_max && cmd_mavlink.param6 <= after_int32_max) {
+		// This looks suspicously like INT32_MAX was sent in a COMMAND_LONG instead of
+		// a COMMAND_INT.
+		vcmd.param5 = (double)NAN;
+		vcmd.param6 = (double)NAN;
+		PX4_ERR("param5/param6 invalid of command %" PRIu16, cmd_mavlink.command);
+
+	} else {
+		vcmd.param5 = (double)cmd_mavlink.param5;
+		vcmd.param6 = (double)cmd_mavlink.param6;
+	}
+
 	vcmd.param7 = cmd_mavlink.param7;
 	vcmd.command = cmd_mavlink.command;
 	vcmd.target_system = cmd_mavlink.target_system;
@@ -407,8 +422,23 @@ MavlinkReceiver::handle_message_command_int(mavlink_message_t *msg)
 	vcmd.param2 = cmd_mavlink.param2;
 	vcmd.param3 = cmd_mavlink.param3;
 	vcmd.param4 = cmd_mavlink.param4;
-	vcmd.param5 = ((double)cmd_mavlink.x) / 1e7;
-	vcmd.param6 = ((double)cmd_mavlink.y) / 1e7;
+
+	if (cmd_mavlink.x == INT32_MAX && cmd_mavlink.y == INT32_MAX) {
+		// INT32_MAX for x and y likely means to ignore it.
+		vcmd.param5 = (double)NAN;
+		vcmd.param6 = (double)NAN;
+
+	} else if (cmd_mavlink.x == 0x7ff80000 && cmd_mavlink.y == 0x7ff80000) {
+		// This looks like NAN was by accident sent as int.
+		vcmd.param5 = (double)NAN;
+		vcmd.param6 = (double)NAN;
+		PX4_ERR("x/y invalid of command %" PRIu16, cmd_mavlink.command);
+
+	} else {
+		vcmd.param5 = ((double)cmd_mavlink.x) / 1e7;
+		vcmd.param6 = ((double)cmd_mavlink.y) / 1e7;
+	}
+
 	vcmd.param7 = cmd_mavlink.z;
 	vcmd.command = cmd_mavlink.command;
 	vcmd.target_system = cmd_mavlink.target_system;
