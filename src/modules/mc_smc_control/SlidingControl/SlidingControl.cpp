@@ -71,7 +71,7 @@ void PositionControl::updateHoverThrust(const float hover_thrust_new)
 	setHoverThrust(hover_thrust_new);
 }
 
-void PositionControl::setState(const PositionControlStates &states)
+void PositionControl::setState(const SlidingPositionControlStates &states)
 {
 	_pos = states.position;
 	_vel = states.velocity;

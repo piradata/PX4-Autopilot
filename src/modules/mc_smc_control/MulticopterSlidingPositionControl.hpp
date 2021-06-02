@@ -218,7 +218,7 @@ private:
 	/**
 	 * Check for validity of positon/velocity states.
 	 */
-	PositionControlStates set_vehicle_states(const vehicle_local_position_s &local_pos);
+	SlidingPositionControlStates set_vehicle_states(const vehicle_local_position_s &local_pos);
 
 	/**
 	 * Adjust the setpoint during landing.
@@ -234,7 +234,7 @@ private:
 	 * setpoints. The failsafe will occur after LOITER_TIME_BEFORE_DESCEND. If force is set
 	 * to true, the failsafe will be initiated immediately.
 	 */
-	void failsafe(const hrt_abstime &now, vehicle_local_position_setpoint_s &setpoint, const PositionControlStates &states,
+	void failsafe(const hrt_abstime &now, vehicle_local_position_setpoint_s &setpoint, const SlidingPositionControlStates &states,
 		      bool warn);
 
 	/**

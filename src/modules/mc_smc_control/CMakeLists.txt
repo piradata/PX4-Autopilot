@@ -31,16 +31,16 @@
 #
 ############################################################################
 
-add_subdirectory(PositionControl)
+add_subdirectory(SlidingControl)
 add_subdirectory(Takeoff)
 
 px4_add_module(
-	MODULE modules__mc_pos_control
-	MAIN mc_pos_control
+	MODULE modules__mc_
+	MAIN mc_smc_control
 	COMPILE_FLAGS
 	SRCS
-		MulticopterPositionControl.cpp
-		MulticopterPositionControl.hpp
+		MulticopterSlidingPositionControl.cpp
+		MulticopterSlidingPositionControl.hpp
 	DEPENDS
 		PositionControl
 		Takeoff

@@ -46,7 +46,7 @@
 #include <uORB/topics/vehicle_attitude_setpoint.h>
 #include <uORB/topics/vehicle_local_position_setpoint.h>
 
-struct PositionControlStates {
+struct SlidingPositionControlStates {
 	matrix::Vector3f position;
 	matrix::Vector3f velocity;
 	matrix::Vector3f acceleration;
@@ -130,9 +130,9 @@ public:
 
 	/**
 	 * Pass the current vehicle state to the controller
-	 * @param PositionControlStates structure
+	 * @param SlidingPositionControlStates structure
 	 */
-	void setState(const PositionControlStates &states);
+	void setState(const SlidingPositionControlStates &states);
 
 	/**
 	 * Pass the desired setpoints

@@ -192,9 +192,9 @@ int MulticopterPositionControl::parameters_update(bool force)
 	return OK;
 }
 
-PositionControlStates MulticopterPositionControl::set_vehicle_states(const vehicle_local_position_s &local_pos)
+SlidingPositionControlStates MulticopterPositionControl::set_vehicle_states(const vehicle_local_position_s &local_pos)
 {
-	PositionControlStates states;
+	SlidingPositionControlStates states;
 
 	// only set position states if valid and finite
 	if (PX4_ISFINITE(local_pos.x) && PX4_ISFINITE(local_pos.y) && local_pos.xy_valid) {
@@ -287,7 +287,7 @@ void MulticopterPositionControl::Run()
 			}
 		}
 
-		PositionControlStates states{set_vehicle_states(local_pos)};
+		SlidingPositionControlStates states{set_vehicle_states(local_pos)};
 
 		if (_control_mode.flag_control_acceleration_enabled || _control_mode.flag_control_climb_rate_enabled) {
 
@@ -481,7 +481,7 @@ void MulticopterPositionControl::Run()
 }
 
 void MulticopterPositionControl::failsafe(const hrt_abstime &now, vehicle_local_position_setpoint_s &setpoint,
-		const PositionControlStates &states, bool warn)
+		const SlidingPositionControlStates &states, bool warn)
 {
 	// do not warn while we are disarmed, as we might not have valid setpoints yet
 	if (!_control_mode.flag_armed) {
@@ -602,7 +602,7 @@ logging.
 	return 0;
 }
 
-extern "C" __EXPORT int mc_pos_control_main(int argc, char *argv[])
+extern "C" __EXPORT int mc_smc_control_main(int argc, char *argv[])
 {
 	return MulticopterPositionControl::main(argc, argv);
 }
