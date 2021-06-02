@@ -529,7 +529,7 @@ int run_startup_script(const std::string &commands_file, const std::string &abso
 	}
 
 
-	PX4_INFO("Calling startup script: %s", shell_command.c_str());
+	PX4_INFO("Calling my startup script: %s", shell_command.c_str());
 
 	int ret = 0;
 
