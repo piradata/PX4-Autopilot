@@ -200,30 +200,30 @@ protected:
 
 	static constexpr const int num_outputs_max = 8;
 
-	struct vehicle_attitude_s		*_v_att;				//vehicle attitude
-	struct vehicle_attitude_setpoint_s	*_v_att_sp;			//vehicle attitude setpoint
-	struct vehicle_attitude_setpoint_s *_mc_virtual_att_sp;	// virtual mc attitude setpoint
-	struct vehicle_attitude_setpoint_s *_fw_virtual_att_sp;	// virtual fw attitude setpoint
-	struct vehicle_control_mode_s		*_v_control_mode;	//vehicle control mode
-	struct vtol_vehicle_status_s 		*_vtol_vehicle_status;
-	struct actuator_controls_s			*_actuators_out_0;			//actuator controls going to the mc mixer
-	struct actuator_controls_s			*_actuators_out_1;			//actuator controls going to the fw mixer (used for elevons)
-	struct actuator_controls_s			*_actuators_mc_in;			//actuator controls from mc_rate_control
-	struct actuator_controls_s			*_actuators_fw_in;			//actuator controls from fw_att_control
-	struct vehicle_local_position_s			*_local_pos;
-	struct vehicle_local_position_setpoint_s	*_local_pos_sp;
-	struct airspeed_validated_s 				*_airspeed_validated;					// airspeed
-	struct tecs_status_s				*_tecs_status;
-	struct vehicle_land_detected_s			*_land_detected;
+	struct vehicle_attitude_s                   *_v_att;                  // vehicle attitude
+	struct vehicle_attitude_setpoint_s          *_v_att_sp;               // vehicle attitude setpoint
+	struct vehicle_attitude_setpoint_s          *_mc_virtual_att_sp;      // virtual mc attitude setpoint
+	struct vehicle_attitude_setpoint_s          *_fw_virtual_att_sp;      // virtual fw attitude setpoint
+	struct vehicle_control_mode_s               *_v_control_mode;	      // vehicle control mode
+	struct vtol_vehicle_status_s                *_vtol_vehicle_status;
+	struct actuator_controls_s                  *_actuators_out_0;        // actuator controls going to the mc mixer
+	struct actuator_controls_s                  *_actuators_out_1;        // actuator controls going to the fw mixer (used for elevons)
+	struct actuator_controls_s                  *_actuators_mc_in;        // actuator controls from mc_rate_control
+	struct actuator_controls_s                  *_actuators_fw_in;        // actuator controls from fw_att_control
+	struct vehicle_local_position_s             *_local_pos;
+	struct vehicle_local_position_setpoint_s    *_local_pos_sp;
+	struct airspeed_validated_s                 *_airspeed_validated;     // airspeed
+	struct tecs_status_s                        *_tecs_status;
+	struct vehicle_land_detected_s              *_land_detected;
 
-	struct Params 					*_params;
+	struct Params                               *_params;
 
 	bool _flag_idle_mc = false;		//false = "idle is set for fixed wing mode"; true = "idle is set for multicopter mode"
 
 	bool _pusher_active = false;
-	float _mc_roll_weight = 1.0f;	// weight for multicopter attitude controller roll output
-	float _mc_pitch_weight = 1.0f;	// weight for multicopter attitude controller pitch output
-	float _mc_yaw_weight = 1.0f;	// weight for multicopter attitude controller yaw output
+	float _mc_roll_weight = 1.0f;	        // weight for multicopter attitude controller roll output
+	float _mc_pitch_weight = 1.0f;	        // weight for multicopter attitude controller pitch output
+	float _mc_yaw_weight = 1.0f;	        // weight for multicopter attitude controller yaw output
 	float _mc_throttle_weight = 1.0f;	// weight for multicopter throttle command. Used to avoid
 
 	// motors spinning up or cutting too fast when doing transitions.
