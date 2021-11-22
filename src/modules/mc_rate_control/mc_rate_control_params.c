@@ -120,6 +120,7 @@ PARAM_DEFINE_FLOAT(MC_ROLLRATE_FF, 0.0f);
  */
 PARAM_DEFINE_FLOAT(MC_ROLLRATE_K, 1.0f);
 
+
 /**
  * Pitch rate P gain
  *

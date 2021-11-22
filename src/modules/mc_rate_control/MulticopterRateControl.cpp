@@ -78,20 +78,46 @@ MulticopterRateControl::parameters_updated()
 	const Vector3f rate_k = Vector3f(_param_mc_rollrate_k.get(), _param_mc_pitchrate_k.get(), _param_mc_yawrate_k.get());
 
 	_rate_control.setGains(
-		rate_k.emult(Vector3f(_param_mc_rollrate_p.get(), _param_mc_pitchrate_p.get(), _param_mc_yawrate_p.get())),
-		rate_k.emult(Vector3f(_param_mc_rollrate_i.get(), _param_mc_pitchrate_i.get(), _param_mc_yawrate_i.get())),
-		rate_k.emult(Vector3f(_param_mc_rollrate_d.get(), _param_mc_pitchrate_d.get(), _param_mc_yawrate_d.get())));
+		rate_k.emult(
+			Vector3f(_param_mc_rollrate_p.get(),
+				 _param_mc_pitchrate_p.get(),
+				 _param_mc_yawrate_p.get()
+				)
+		),
+		rate_k.emult(
+			Vector3f(_param_mc_rollrate_i.get(),
+				 _param_mc_pitchrate_i.get(),
+				 _param_mc_yawrate_i.get()
+				)
+		),
+		rate_k.emult(
+			Vector3f(_param_mc_rollrate_d.get(),
+				 _param_mc_pitchrate_d.get(),
+				 _param_mc_yawrate_d.get()
+				)
+		)
+	);
 
 	_rate_control.setIntegratorLimit(
-		Vector3f(_param_mc_rr_int_lim.get(), _param_mc_pr_int_lim.get(), _param_mc_yr_int_lim.get()));
+		Vector3f(_param_mc_rr_int_lim.get(),
+			 _param_mc_pr_int_lim.get(),
+			 _param_mc_yr_int_lim.get()
+			)
+	);
 
 	_rate_control.setFeedForwardGain(
-		Vector3f(_param_mc_rollrate_ff.get(), _param_mc_pitchrate_ff.get(), _param_mc_yawrate_ff.get()));
+		Vector3f(_param_mc_rollrate_ff.get(),
+			 _param_mc_pitchrate_ff.get(),
+			 _param_mc_yawrate_ff.get()
+			)
+	);
 
 
 	// manual rate control acro mode rate limits
-	_acro_rate_max = Vector3f(radians(_param_mc_acro_r_max.get()), radians(_param_mc_acro_p_max.get()),
-				  radians(_param_mc_acro_y_max.get()));
+	_acro_rate_max = Vector3f(radians(_param_mc_acro_r_max.get()),
+				  radians(_param_mc_acro_p_max.get()),
+				  radians(_param_mc_acro_y_max.get())
+				 );
 
 	_actuators_0_circuit_breaker_enabled = circuit_breaker_enabled_by_val(_param_cbrk_rate_ctrl.get(), CBRK_RATE_CTRL_KEY);
 }

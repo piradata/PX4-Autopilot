@@ -40,6 +40,7 @@
 
 using namespace matrix;
 
+
 void RateControl::setGains(const Vector3f &P, const Vector3f &I, const Vector3f &D)
 {
 	_gain_p = P;

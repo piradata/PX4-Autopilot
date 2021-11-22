@@ -341,6 +341,7 @@
             "description": "gazebo model",
             "options": [
               "iris",
+              "iris_with_rope",
               "typhoon_h480",
               "plane",
               "plane_catapult",
@@ -360,6 +361,7 @@
             "options": [
                 "baylands",
                 "empty",
+                "not_so_empty",
                 "ksql_airport",
                 "mcmillan_airfield",
                 "sonoma_raceway",

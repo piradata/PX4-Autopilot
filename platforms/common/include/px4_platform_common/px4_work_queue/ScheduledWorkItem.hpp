@@ -84,6 +84,7 @@ private:
 
 	virtual void Run() override = 0;
 
+
 	static void	schedule_trampoline(void *arg);
 
 	hrt_call	_call{};
