@@ -85,8 +85,11 @@ public:
 	 * @param dt desired vehicle angular rate setpoint
 	 * @return [-1,1] normalized torque vector to apply to the vehicle
 	 */
-	matrix::Vector3f update(const matrix::Vector3f &rate, const matrix::Vector3f &rate_sp,
-				const matrix::Vector3f &angular_accel, const float dt, const bool landed);
+	matrix::Vector3f update(const matrix::Vector3f &rate,
+				const matrix::Vector3f &rate_sp,
+				const matrix::Vector3f &angular_accel,
+				const float dt,
+				const bool landed);
 
 	/**
 	 * Set the integral term to 0 to prevent windup
@@ -100,7 +103,8 @@ public:
 	 */
 	void getRateControlStatus(rate_ctrl_status_s &rate_ctrl_status);
 
-	matrix::Vector3f signale(matrix::Vector3f &vector);
+	matrix::Vector3f signale(const matrix::Vector3f &vector);
+	matrix::Vector3f tanh_v(const matrix::Vector3f &vector);
 
 private:
 	void updateIntegral(matrix::Vector3f &rate_error, const float dt);

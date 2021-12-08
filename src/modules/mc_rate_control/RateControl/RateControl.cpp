@@ -38,6 +38,9 @@
 #include <RateControl.hpp>
 #include <px4_platform_common/defines.h>
 
+// #define __float_f %d.%.6d
+#define __value_f(num) (int)num, (int)((num-(int)num)*1000000)
+
 using namespace matrix;
 
 
@@ -58,18 +61,36 @@ void RateControl::setSaturationStatus(const MultirotorMixer::saturation_status &
 	_mixer_saturation_negative[2] = status.flags.yaw_neg;
 }
 
-Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, const Vector3f &angular_accel,
-			     const float dt, const bool landed)
+Vector3f RateControl::update(const Vector3f &rate,
+			     const Vector3f &rate_sp,
+			     const Vector3f &angular_accel,
+			     const float dt,
+			     const bool landed)
 {
+	// define lambda
+	const float _lambda = 5.0f;
+	// define K
+	const float _K = 5.0f;
+	// define beta
+	const float _beta = 10.0f;
+
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
-
 	// sliding gain
-	Vector3f sliding_gain = signale(rate_error);
+	// Vector3f sliding_gain = tanh_v(rate_error);
 
 	// PID control with feed forward
 	// const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
-	const Vector3f torque = _gain_p.emult(sliding_gain) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+
+	// simple use sliding gain instead of rate_error
+	// const Vector3f torque = _gain_p.emult(sliding_gain) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+
+	// SMC without tanh
+	// const Vector3f torque = - _K * signale(_beta * (angular_accel + _lambda * rate_error));
+
+	// SMC with tanh
+	const Vector3f torque = - _K * tanh_v(_beta * (angular_accel + _lambda * rate_error));
+
 
 	// update integral only if we are not landed
 	if (!landed) {
@@ -118,17 +139,33 @@ void RateControl::getRateControlStatus(rate_ctrl_status_s &rate_ctrl_status)
 	rate_ctrl_status.yawspeed_integ = _rate_int(2);
 }
 
-Vector3f RateControl::signale(Vector3f &vector)
+Vector3f RateControl::signale(const Vector3f &vector)
 {
 	Vector3f result_signale(0, 0, 0);
-
 	for (int i = 0; i < 3; i++){
-		// change for sigmoid or arctan instead for linearization
-		// and lower of chattering
-		result_signale(i) = (vector(i)>0.f) ? 1.f : -1.f;
-		// PX4_INFO("value is %d", i);
-		// result_signale(i) = 1.f;
+		result_signale(i) = (vector(i)>=0.f) ? 1.f : -1.f;
 	}
+	return result_signale;
+}
+
+
+Vector3f RateControl::tanh_v(const Vector3f &vector)
+{
+	// const Vector3f dummy_vec(1, 5, 10);
+	Vector3f result_signale(0, 0, 0);
+	for (int i = 0; i < 3; i++){
+		// result_signale(i) = std::tanh(dummy_vec(i));
+		result_signale(i) = std::tanh(vector(i));
+	}
+
+	PX4_INFO("###\nOriginal: [%d.%.6d, %d.%.6d, %d.%.6d]\nModified: [%d.%.6d, %d.%.6d, %d.%.6d]",
+			__value_f(vector(0)),
+			__value_f(vector(1)),
+			__value_f(vector(2)),
+			__value_f(result_signale(0)),
+			__value_f(result_signale(1)),
+			__value_f(result_signale(2))
+		);
 
 	return result_signale;
 }
