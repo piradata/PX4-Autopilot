@@ -64,8 +64,12 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
 
+	// sliding gain
+	Vector3f sliding_gain = signale(rate_error);
+
 	// PID control with feed forward
-	const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+	// const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+	const Vector3f torque = _gain_p.emult(sliding_gain) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
 
 	// update integral only if we are not landed
 	if (!landed) {
@@ -112,4 +116,19 @@ void RateControl::getRateControlStatus(rate_ctrl_status_s &rate_ctrl_status)
 	rate_ctrl_status.rollspeed_integ = _rate_int(0);
 	rate_ctrl_status.pitchspeed_integ = _rate_int(1);
 	rate_ctrl_status.yawspeed_integ = _rate_int(2);
+}
+
+Vector3f RateControl::signale(Vector3f &vector)
+{
+	Vector3f result_signale(0, 0, 0);
+
+	for (int i = 0; i < 3; i++){
+		// change for sigmoid or arctan instead for linearization
+		// and lower of chattering
+		result_signale(i) = (vector(i)>0.f) ? 1.f : -1.f;
+		// PX4_INFO("value is %d", i);
+		// result_signale(i) = 1.f;
+	}
+
+	return result_signale;
 }

@@ -100,6 +100,8 @@ public:
 	 */
 	void getRateControlStatus(rate_ctrl_status_s &rate_ctrl_status);
 
+	matrix::Vector3f signale(matrix::Vector3f &vector);
+
 private:
 	void updateIntegral(matrix::Vector3f &rate_error, const float dt);
 
