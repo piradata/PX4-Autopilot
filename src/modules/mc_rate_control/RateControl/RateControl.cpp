@@ -72,7 +72,7 @@ Vector3f RateControl::update(const Vector3f &rate,
 	// define K
 	const float _K = 5.0f;
 	// define beta
-	const float _beta = 10.0f;
+	const float _beta = 1.0f;
 
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
@@ -80,7 +80,7 @@ Vector3f RateControl::update(const Vector3f &rate,
 	// Vector3f sliding_gain = tanh_v(rate_error);
 
 	// PID control with feed forward
-	// const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+	const Vector3f torque_old = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
 
 	// simple use sliding gain instead of rate_error
 	// const Vector3f torque = _gain_p.emult(sliding_gain) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
@@ -89,15 +89,24 @@ Vector3f RateControl::update(const Vector3f &rate,
 	// const Vector3f torque = - _K * signale(_beta * (angular_accel + _lambda * rate_error));
 
 	// SMC with tanh
-	const Vector3f torque = - _K * tanh_v(_beta * (angular_accel + _lambda * rate_error));
+	const Vector3f torque_new = - _K * tanh_v(_beta * (angular_accel + _lambda * rate_error));
+	// const Vector3f torque_new = - _gain_p.emult(tanh_v(_beta * (angular_accel + _lambda * rate_error))) + _gain_ff.emult(rate_sp);
 
+	PX4_INFO("###\nOld: [%d.%.6d, %d.%.6d, %d.%.6d]\nNew: [%d.%.6d, %d.%.6d, %d.%.6d]",
+			__value_f(torque_old(0)),
+			__value_f(torque_old(1)),
+			__value_f(torque_old(2)),
+			__value_f(torque_new(0)),
+			__value_f(torque_new(1)),
+			__value_f(torque_new(2))
+		);
 
 	// update integral only if we are not landed
 	if (!landed) {
 		updateIntegral(rate_error, dt);
 	}
 
-	return torque;
+	return torque_new;
 }
 
 void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
@@ -158,14 +167,14 @@ Vector3f RateControl::tanh_v(const Vector3f &vector)
 		result_signale(i) = std::tanh(vector(i));
 	}
 
-	PX4_INFO("###\nOriginal: [%d.%.6d, %d.%.6d, %d.%.6d]\nModified: [%d.%.6d, %d.%.6d, %d.%.6d]",
-			__value_f(vector(0)),
-			__value_f(vector(1)),
-			__value_f(vector(2)),
-			__value_f(result_signale(0)),
-			__value_f(result_signale(1)),
-			__value_f(result_signale(2))
-		);
+	// PX4_INFO("###\nOriginal: [%d.%.6d, %d.%.6d, %d.%.6d]\nModified: [%d.%.6d, %d.%.6d, %d.%.6d]",
+	// 		__value_f(vector(0)),
+	// 		__value_f(vector(1)),
+	// 		__value_f(vector(2)),
+	// 		__value_f(result_signale(0)),
+	// 		__value_f(result_signale(1)),
+	// 		__value_f(result_signale(2))
+	// 	);
 
 	return result_signale;
 }
