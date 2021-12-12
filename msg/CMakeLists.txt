@@ -35,6 +35,7 @@
 cmake_policy(SET CMP0057 NEW)
 
 set(msg_files
+	vehicle_smc_gains.msg
 	actuator_armed.msg
 	actuator_controls.msg
 	actuator_outputs.msg
