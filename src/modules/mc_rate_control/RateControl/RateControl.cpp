@@ -65,34 +65,36 @@ Vector3f RateControl::update(const Vector3f &rate,
 			     const Vector3f &rate_sp,
 			     const Vector3f &angular_accel,
 			     const float dt,
-			     const bool landed)
-{
-	// define lambda
-	const float _lambda = 5.0f;
-	// define K
-	const float _K = 5.0f;
-	// define beta
-	const float _beta = 1.0f;
+			     const bool landed){
+
+	// grab corresponding vehicle_angular_acceleration immediately after vehicle_angular_velocity copy
+	vehicle_smc_gains_s smc_gains{};
+	_vehicle_smc_gains_sub.copy(&smc_gains);
+
+	// define lambda, K and beta
+	const Vector3f _gain_lambda(20.0f, 20.0f, 10.0f);
+	const Vector3f _gain_K(0.23f, 0.23f, 0.1f);
+	const Vector3f _gain_beta(0.05f, 0.05f, 0.1f);
 
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
+
 	// sliding gain
 	// Vector3f sliding_gain = tanh_v(rate_error);
 
 	// PID control with feed forward
 	const Vector3f torque_old = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
 
-	// simple use sliding gain instead of rate_error
-	// const Vector3f torque = _gain_p.emult(sliding_gain) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
-
-	// SMC without tanh
-	// const Vector3f torque = - _K * signale(_beta * (angular_accel + _lambda * rate_error));
-
 	// SMC with tanh
-	const Vector3f torque_new = - _K * tanh_v(_beta * (angular_accel + _lambda * rate_error));
-	// const Vector3f torque_new = - _gain_p.emult(tanh_v(_beta * (angular_accel + _lambda * rate_error))) + _gain_ff.emult(rate_sp);
+	const Vector3f torque_new = _gain_K.emult(tanh_v(_gain_beta.emult(_gain_lambda.emult(rate_error) - angular_accel)));
 
-	PX4_INFO("###\nOld: [%d.%.6d, %d.%.6d, %d.%.6d]\nNew: [%d.%.6d, %d.%.6d, %d.%.6d]",
+	PX4_INFO("###\nError: [%d.%.6d, %d.%.6d, %d.%.6d]\nAccel: [%d.%.6d, %d.%.6d, %d.%.6d]\nOld: [%d.%.6d, %d.%.6d, %d.%.6d]\nNew: [%d.%.6d, %d.%.6d, %d.%.6d]",
+			__value_f(rate_error(0)),
+			__value_f(rate_error(1)),
+			__value_f(rate_error(2)),
+			__value_f(angular_accel(0)),
+			__value_f(angular_accel(1)),
+			__value_f(angular_accel(2)),
 			__value_f(torque_old(0)),
 			__value_f(torque_old(1)),
 			__value_f(torque_old(2)),
@@ -147,6 +149,13 @@ void RateControl::getRateControlStatus(rate_ctrl_status_s &rate_ctrl_status)
 	rate_ctrl_status.pitchspeed_integ = _rate_int(1);
 	rate_ctrl_status.yawspeed_integ = _rate_int(2);
 }
+
+// void RateControl::getSMCParams(vehicle_smc_gains_s &rate_smc_params_s)
+// {
+// 	rate_smc_params.rollspeed_integ = _rate_int(0);
+// 	rate_smc_params.pitchspeed_integ = _rate_int(1);
+// 	rate_smc_params.yawspeed_integ = _rate_int(2);
+// }
 
 Vector3f RateControl::signale(const Vector3f &vector)
 {

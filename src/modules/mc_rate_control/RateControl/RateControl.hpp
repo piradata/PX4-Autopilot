@@ -38,12 +38,17 @@
  */
 
 #pragma once
-
 #include <matrix/matrix/math.hpp>
 #include <mathlib/math/filter/LowPassFilter2pVector3f.hpp>
 
 #include <lib/mixer/MultirotorMixer/MultirotorMixer.hpp>
 #include <uORB/topics/rate_ctrl_status.h>
+
+#include <uORB/Publication.hpp>
+#include <uORB/PublicationMulti.hpp>
+#include <uORB/Subscription.hpp>
+#include <uORB/SubscriptionCallback.hpp>
+#include <uORB/topics/vehicle_smc_gains.h>
 
 class RateControl
 {
@@ -121,4 +126,6 @@ private:
 
 	bool _mixer_saturation_positive[3] {};
 	bool _mixer_saturation_negative[3] {};
+
+	uORB::Subscription _vehicle_smc_gains_sub{ORB_ID(vehicle_smc_gains)};
 };
