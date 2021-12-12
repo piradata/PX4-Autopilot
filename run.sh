@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rosrun wpg fuzzy_v_py3.py
+rosrun wpg v6_fuzzy_vel_smc_py3.py
