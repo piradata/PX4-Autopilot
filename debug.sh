@@ -2,5 +2,9 @@
 ./connect.sh &> /dev/null &
 sleep 2
 ./gclient.sh &> /dev/null &
-rosbag record -a &> /dev/null &
-./run.sh
+
+
+# ./connect.sh
+# ./gclient.sh
+# rosbag record -a -O PID_test
+# ./run.sh
