@@ -88,20 +88,20 @@ Vector3f RateControl::update(const Vector3f &rate,
 	// SMC with tanh
 	const Vector3f torque_new = _gain_K.emult(tanh_v(_gain_beta.emult(_gain_lambda.emult(rate_error) - angular_accel)));
 
-	PX4_INFO("###\nError: [%d.%.6d, %d.%.6d, %d.%.6d]\nAccel: [%d.%.6d, %d.%.6d, %d.%.6d]\nOld: [%d.%.6d, %d.%.6d, %d.%.6d]\nNew: [%d.%.6d, %d.%.6d, %d.%.6d]",
-			__value_f(rate_error(0)),
-			__value_f(rate_error(1)),
-			__value_f(rate_error(2)),
-			__value_f(angular_accel(0)),
-			__value_f(angular_accel(1)),
-			__value_f(angular_accel(2)),
-			__value_f(torque_old(0)),
-			__value_f(torque_old(1)),
-			__value_f(torque_old(2)),
-			__value_f(torque_new(0)),
-			__value_f(torque_new(1)),
-			__value_f(torque_new(2))
-		);
+	// PX4_INFO("###\nError: [%d.%.6d, %d.%.6d, %d.%.6d]\nAccel: [%d.%.6d, %d.%.6d, %d.%.6d]\nOld: [%d.%.6d, %d.%.6d, %d.%.6d]\nNew: [%d.%.6d, %d.%.6d, %d.%.6d]",
+	// 		__value_f(rate_error(0)),
+	// 		__value_f(rate_error(1)),
+	// 		__value_f(rate_error(2)),
+	// 		__value_f(angular_accel(0)),
+	// 		__value_f(angular_accel(1)),
+	// 		__value_f(angular_accel(2)),
+	// 		__value_f(torque_old(0)),
+	// 		__value_f(torque_old(1)),
+	// 		__value_f(torque_old(2)),
+	// 		__value_f(torque_new(0)),
+	// 		__value_f(torque_new(1)),
+	// 		__value_f(torque_new(2))
+	// 	);
 
 	// update integral only if we are not landed
 	if (!landed) {
