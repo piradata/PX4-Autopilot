@@ -108,7 +108,7 @@ Vector3f RateControl::update(const Vector3f &rate,
 		updateIntegral(rate_error, dt);
 	}
 
-	return torque_new;
+	return torque_old;
 }
 
 void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
