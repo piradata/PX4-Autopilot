@@ -127,5 +127,4 @@ private:
 	bool _mixer_saturation_positive[3] {};
 	bool _mixer_saturation_negative[3] {};
 
-	uORB::Subscription _vehicle_smc_gains_sub{ORB_ID(vehicle_smc_gains)};
 };
