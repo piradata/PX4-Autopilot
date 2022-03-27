@@ -68,44 +68,30 @@ Vector3f RateControl::update(const Vector3f &rate,
 			     const bool landed){
 
 	// define lambda, K and beta
-	const Vector3f _gain_lambda(22.0f, 22.0f, 11.0f);
-	const Vector3f _gain_K(0.20f, 0.20f, 0.82f);
-	const Vector3f _gain_beta(0.035f, 0.035f, 0.8f);
+	// const Vector3f _gain_lambda(22.0f, 22.0f, 11.0f);
+	// const Vector3f _gain_K(0.20f, 0.20f, 0.82f);
+	// const Vector3f _gain_beta(0.035f, 0.035f, 0.8f);
+
+	const Vector3f _gain_lambda(20.0f, 20.0f, 10.0f);
+	const Vector3f _gain_K(0.23f, 0.23f, 0.1f);
+	const Vector3f _gain_beta(0.05f, 0.05f, 0.1f);
 
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
 
-	// sliding gain
-	// Vector3f sliding_gain = tanh_v(rate_error);
-
 	// PID control with feed forward
-	// const Vector3f torque_old = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+	// const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
 
 	// SMC with tanh
-	const Vector3f torque_new = _gain_K.emult(tanh_v(_gain_beta.emult(_gain_lambda.emult(rate_error) - angular_accel)));
-
-	// PX4_INFO("###\nError: [%d.%.6d, %d.%.6d, %d.%.6d]\nAccel: [%d.%.6d, %d.%.6d, %d.%.6d]\nOld: [%d.%.6d, %d.%.6d, %d.%.6d]\nNew: [%d.%.6d, %d.%.6d, %d.%.6d]",
-	// 		__value_f(rate_error(0)),
-	// 		__value_f(rate_error(1)),
-	// 		__value_f(rate_error(2)),
-	// 		__value_f(angular_accel(0)),
-	// 		__value_f(angular_accel(1)),
-	// 		__value_f(angular_accel(2)),
-	// 		__value_f(torque_old(0)),
-	// 		__value_f(torque_old(1)),
-	// 		__value_f(torque_old(2)),
-	// 		__value_f(torque_new(0)),
-	// 		__value_f(torque_new(1)),
-	// 		__value_f(torque_new(2))
-	// 	);
+	Vector3f sliding_gain = tanh_v(rate_error);
+	const Vector3f torque = _gain_K.emult(tanh_v(_gain_beta.emult(_gain_lambda.emult(rate_error) - angular_accel)));
 
 	// update integral only if we are not landed
 	if (!landed) {
 		updateIntegral(rate_error, dt);
 	}
 
-	// return torque_old;
-	return torque_new;
+	return torque;
 }
 
 void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
@@ -166,15 +152,5 @@ Vector3f RateControl::tanh_v(const Vector3f &vector)
 		// result_signale(i) = std::tanh(dummy_vec(i));
 		result_signale(i) = std::tanh(vector(i));
 	}
-
-	// PX4_INFO("###\nOriginal: [%d.%.6d, %d.%.6d, %d.%.6d]\nModified: [%d.%.6d, %d.%.6d, %d.%.6d]",
-	// 		__value_f(vector(0)),
-	// 		__value_f(vector(1)),
-	// 		__value_f(vector(2)),
-	// 		__value_f(result_signale(0)),
-	// 		__value_f(result_signale(1)),
-	// 		__value_f(result_signale(2))
-	// 	);
-
 	return result_signale;
 }
