@@ -83,7 +83,7 @@ Vector3f RateControl::update(const Vector3f &rate,
 	// const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
 
 	// SMC with tanh
-	Vector3f sliding_gain = tanh_v(rate_error);
+	// Vector3f sliding_gain = tanh_v(rate_error);
 	const Vector3f torque = _gain_K.emult(tanh_v(_gain_beta.emult(_gain_lambda.emult(rate_error) - angular_accel)));
 
 	// update integral only if we are not landed
