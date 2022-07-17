@@ -61,17 +61,14 @@ void RateControl::setSaturationStatus(const MultirotorMixer::saturation_status &
 	_mixer_saturation_negative[2] = status.flags.yaw_neg;
 }
 
-Vector3f RateControl::update(const Vector3f &rate,
-			     const Vector3f &rate_sp,
-			     const Vector3f &angular_accel,
-			     const float dt,
-			     const bool landed){
+Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, const Vector3f &angular_accel,
+				 const float dt, const bool landed)
+{
 
 	// define lambda, K and beta
 	// const Vector3f _gain_lambda(22.0f, 22.0f, 11.0f);
 	// const Vector3f _gain_K(0.20f, 0.20f, 0.82f);
 	// const Vector3f _gain_beta(0.035f, 0.035f, 0.8f);
-
 	const Vector3f _gain_lambda(20.0f, 20.0f, 10.0f);
 	const Vector3f _gain_K(0.23f, 0.23f, 0.1f);
 	const Vector3f _gain_beta(0.05f, 0.05f, 0.1f);
@@ -85,6 +82,7 @@ Vector3f RateControl::update(const Vector3f &rate,
 	// SMC with tanh
 	// Vector3f sliding_gain = tanh_v(rate_error);
 	const Vector3f torque = _gain_K.emult(tanh_v(_gain_beta.emult(_gain_lambda.emult(rate_error) - angular_accel)));
+	// const Vector3f torque = _gain_K.emult(signale(_gain_beta.emult(_gain_lambda.emult(rate_error) - angular_accel)));
 
 	// update integral only if we are not landed
 	if (!landed) {
@@ -92,6 +90,26 @@ Vector3f RateControl::update(const Vector3f &rate,
 	}
 
 	return torque;
+}
+
+Vector3f RateControl::tanh_v(const Vector3f &vector)
+{
+	// const Vector3f dummy_vec(1, 5, 10);
+	Vector3f result_signale(0, 0, 0);
+	for (int i = 0; i < 3; i++){
+		// result_signale(i) = std::tanh(dummy_vec(i));
+		result_signale(i) = std::tanh(vector(i));
+	}
+	return result_signale;
+}
+
+Vector3f RateControl::signale(const Vector3f &vector)
+{
+	Vector3f result_signale(0, 0, 0);
+	for (int i = 0; i < 3; i++){
+		result_signale(i) = (vector(i)>=0.f) ? 1.f : -1.f;
+	}
+	return result_signale;
 }
 
 void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
@@ -133,24 +151,3 @@ void RateControl::getRateControlStatus(rate_ctrl_status_s &rate_ctrl_status)
 	rate_ctrl_status.yawspeed_integ = _rate_int(2);
 }
 
-
-Vector3f RateControl::signale(const Vector3f &vector)
-{
-	Vector3f result_signale(0, 0, 0);
-	for (int i = 0; i < 3; i++){
-		result_signale(i) = (vector(i)>=0.f) ? 1.f : -1.f;
-	}
-	return result_signale;
-}
-
-
-Vector3f RateControl::tanh_v(const Vector3f &vector)
-{
-	// const Vector3f dummy_vec(1, 5, 10);
-	Vector3f result_signale(0, 0, 0);
-	for (int i = 0; i < 3; i++){
-		// result_signale(i) = std::tanh(dummy_vec(i));
-		result_signale(i) = std::tanh(vector(i));
-	}
-	return result_signale;
-}
