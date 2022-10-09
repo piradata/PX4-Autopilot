@@ -77,6 +77,10 @@ Vector3f RateControl::update(
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
 
+
+	// PID control with feed forward
+	// const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+
 	// SMC with tanh
 	const Vector3f torque = _gain_K.emult(tanh_v(_gain_beta.emult(_gain_lambda.emult(rate_error) - angular_accel)));
 
