@@ -138,6 +138,21 @@ Vector3f RateControl::update(
 		__value_f(_gain_ff(2))
 	);
 
+	PX4_INFO("###\nGainKappa: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainAlpha: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainBeta: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainGamma: [%d.%.6d, %d.%.6d, %d.%.6d]",
+		__value_f(_gain_kappa(1)),
+		__value_f(_gain_kappa(0)),
+		__value_f(_gain_kappa(2)),
+		__value_f(_gain_alpha(0)),
+		__value_f(_gain_alpha(1)),
+		__value_f(_gain_alpha(2)),
+		__value_f(_gain_beta(0)),
+		__value_f(_gain_beta(1)),
+		__value_f(_gain_beta(2)),
+		__value_f(_gain_gamma(0)),
+		__value_f(_gain_gamma(1)),
+		__value_f(_gain_gamma(2))
+	);
+
 	PX4_INFO("###\n\n###
 
 	// update integral only if we are not landed
