@@ -78,7 +78,7 @@ Vector3f RateControl::update(
 	// define gains Kappa, Alpha, Beta and Gamma
 	const Vector3f _gain_kappa(0.23f, 0.23f, 0.1f);
 	const Vector3f _gain_alpha(1.0f, 1.0f, 2.0f);
-	const Vector3f _gain_beta(1.0f, 1.0f, 2.0f);
+	const Vector3f _gain_beta(1.0f, 1.0f, 1.0f);
 	const Vector3f _gain_gamma(0.05f, 0.05f, 0.1f);
 
 	// angular rates error
@@ -114,7 +114,7 @@ Vector3f RateControl::update(
 		__value_f(torque(2))
 	);
 
-	PX4_INFO("###\nError: [%d.%.6d, %d.%.6d, %d.%.6d]\nErrorIntegral: [%d.%.6d, %d.%.6d, %d.%.6d]",
+	PX4_INFO("###\nRateSetpoint: [%d.%.6d, %d.%.6d, %d.%.6d]\nRateCurrent: [%d.%.6d, %d.%.6d, %d.%.6d]",
 		__value_f(rate_sp(0)),
 		__value_f(rate_sp(1)),
 		__value_f(rate_sp(2)),
