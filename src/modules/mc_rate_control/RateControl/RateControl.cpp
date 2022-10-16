@@ -70,16 +70,18 @@ Vector3f RateControl::update(
 {
 
 	// define gains P, I, D and FF
-	// const Vector3f _gain_p(0.23f, 0.23f, 0.1f);
-	// const Vector3f _gain_i(0.23f, 0.23f, 0.1f);
-	// const Vector3f _gain_d(0.23f, 0.23f, 0.1f);
-	// const Vector3f _gain_ff(0.23f, 0.23f, 0.1f);
+	// const Vector3f _gain_ff(0.0f, 0.0f, 0.0f);
+	
+	// const Vector3f _gain_p(0.15f, 0.15f, 0.2f);
+	// const Vector3f _gain_i(0.2f, 0.2f, 0.1f);
+	// const Vector3f _gain_d(0.003f, 0.003f, 0.0f);
 
 	// define gains Kappa, Alpha, Beta and Gamma
-	const Vector3f _gain_kappa(0.23f, 0.23f, 0.1f);
-	const Vector3f _gain_alpha(1.0f, 1.0f, 2.0f);
-	const Vector3f _gain_beta(1.0f, 1.0f, 1.0f);
-	const Vector3f _gain_gamma(0.05f, 0.05f, 0.1f);
+	const Vector3f _gain_kappa(0.26f, 0.26f, 0.08f);
+
+	const Vector3f _gain_alpha(1.0f, 1.0f, 1.3f);
+	// const Vector3f _gain_beta(0.2f, 0.2f, 0.1f);
+	const Vector3f _gain_gamma(0.006f, 0.006f, 0.0f);
 
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
@@ -88,72 +90,65 @@ Vector3f RateControl::update(
 	// PID control with feed forward
 	// const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
 
-	// SMC with tanh (PD surface)
+	// // SMC with tanh (PD surface)
 	// const Vector3f torque = _gain_kappa.emult(tanh_v(
 	// 	_gain_alpha.emult(rate_error) - _gain_gamma.emult(angular_accel)
 	// ));
 
 	// SMC with tanh (PID surface)
+	// const Vector3f torque = _gain_kappa.emult(tanh_v(
+	// 	_gain_alpha.emult(rate_error) + _gain_beta.emult(_rate_int).edivide(_gain_i) - _gain_gamma.emult(angular_accel)
+	// ));
 	const Vector3f torque = _gain_kappa.emult(tanh_v(
-		_gain_alpha.emult(rate_error) + _gain_beta.emult(_rate_int).edivide(_gain_i) - _gain_gamma.emult(angular_accel)
+		_gain_alpha.emult(rate_error) + _rate_int - _gain_gamma.emult(angular_accel)
 	));
 	
+// PX4_INFO("###\nError: [%d.%.6d, %d.%.6d, %d.%.6d]\nErrorIntegral: [%d.%.6d, %d.%.6d, %d.%.6d]\nAccel: [%d.%.6d, %d.%.6d, %d.%.6d]\nTorque: [%d.%.6d, %d.%.6d, %d.%.6d]\n###\nRateSetpoint: [%d.%.6d, %d.%.6d, %d.%.6d]\nRateCurrent: [%d.%.6d, %d.%.6d, %d.%.6d]\n###\nGainP: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainI: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainD: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainFF: [%d.%.6d, %d.%.6d, %d.%.6d]\n###\nGainKappa: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainAlpha: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainBeta: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainGamma: [%d.%.6d, %d.%.6d, %d.%.6d]\n\n",
+// 		__value_f(rate_error(0)),
+// 		__value_f(rate_error(1)),
+// 		__value_f(rate_error(2)),
+// 		__value_f(_rate_int(0)),
+// 		__value_f(_rate_int(1)),
+// 		__value_f(_rate_int(2)),
+// 		__value_f(angular_accel(0)),
+// 		__value_f(angular_accel(1)),
+// 		__value_f(angular_accel(2)),
+// 		__value_f(torque(0)),
+// 		__value_f(torque(1)),
+// 		__value_f(torque(2)),
+// 		__value_f(rate_sp(0)),
+// 		__value_f(rate_sp(1)),
+// 		__value_f(rate_sp(2)),
+// 		__value_f(rate(0)),
+// 		__value_f(rate(1)),
+// 		__value_f(rate(2)),
+// 		__value_f(_gain_p(1)),
+// 		__value_f(_gain_p(0)),
+// 		__value_f(_gain_p(2)),
+// 		__value_f(_gain_i(0)),
+// 		__value_f(_gain_i(1)),
+// 		__value_f(_gain_i(2)),
+// 		__value_f(_gain_d(0)),
+// 		__value_f(_gain_d(1)),
+// 		__value_f(_gain_d(2)),
+// 		__value_f(_gain_ff(0)),
+// 		__value_f(_gain_ff(1)),
+// 		__value_f(_gain_ff(2)),
+// 		__value_f(_gain_kappa(1)),
+// 		__value_f(_gain_kappa(0)),
+// 		__value_f(_gain_kappa(2)),
+// 		__value_f(_gain_alpha(0)),
+// 		__value_f(_gain_alpha(1)),
+// 		__value_f(_gain_alpha(2)),
+// 		__value_f(_gain_beta(0)),
+// 		__value_f(_gain_beta(1)),
+// 		__value_f(_gain_beta(2)),
+// 		__value_f(_gain_gamma(0)),
+// 		__value_f(_gain_gamma(1)),
+// 		__value_f(_gain_gamma(2))
+// 	);
 
-	PX4_INFO("###\nError: [%d.%.6d, %d.%.6d, %d.%.6d]\nErrorIntegral: [%d.%.6d, %d.%.6d, %d.%.6d]\nAccel: [%d.%.6d, %d.%.6d, %d.%.6d]\nTorque: [%d.%.6d, %d.%.6d, %d.%.6d]",
-		__value_f(rate_error(0)),
-		__value_f(rate_error(1)),
-		__value_f(rate_error(2)),
-		__value_f(_rate_int(0)),
-		__value_f(_rate_int(1)),
-		__value_f(_rate_int(2)),
-		__value_f(angular_accel(0)),
-		__value_f(angular_accel(1)),
-		__value_f(angular_accel(2)),
-		__value_f(torque(0)),
-		__value_f(torque(1)),
-		__value_f(torque(2))
-	);
-
-	PX4_INFO("###\nRateSetpoint: [%d.%.6d, %d.%.6d, %d.%.6d]\nRateCurrent: [%d.%.6d, %d.%.6d, %d.%.6d]",
-		__value_f(rate_sp(0)),
-		__value_f(rate_sp(1)),
-		__value_f(rate_sp(2)),
-		__value_f(rate(0)),
-		__value_f(rate(1)),
-		__value_f(rate(2))
-	);
-
-	PX4_INFO("###\nGainP: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainI: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainD: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainFF: [%d.%.6d, %d.%.6d, %d.%.6d]",
-		__value_f(_gain_p(1)),
-		__value_f(_gain_p(0)),
-		__value_f(_gain_p(2)),
-		__value_f(_gain_i(0)),
-		__value_f(_gain_i(1)),
-		__value_f(_gain_i(2)),
-		__value_f(_gain_d(0)),
-		__value_f(_gain_d(1)),
-		__value_f(_gain_d(2)),
-		__value_f(_gain_ff(0)),
-		__value_f(_gain_ff(1)),
-		__value_f(_gain_ff(2))
-	);
-
-	PX4_INFO("###\nGainKappa: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainAlpha: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainBeta: [%d.%.6d, %d.%.6d, %d.%.6d]\nGainGamma: [%d.%.6d, %d.%.6d, %d.%.6d]",
-		__value_f(_gain_kappa(1)),
-		__value_f(_gain_kappa(0)),
-		__value_f(_gain_kappa(2)),
-		__value_f(_gain_alpha(0)),
-		__value_f(_gain_alpha(1)),
-		__value_f(_gain_alpha(2)),
-		__value_f(_gain_beta(0)),
-		__value_f(_gain_beta(1)),
-		__value_f(_gain_beta(2)),
-		__value_f(_gain_gamma(0)),
-		__value_f(_gain_gamma(1)),
-		__value_f(_gain_gamma(2))
-	);
-
-	PX4_INFO("###\n\n###
+	// PX4_INFO("\nEEEEEE NN  NN DDDDD\nEEE    NNN NN DD DDD\nEEEEEE NNNNNN DD  DD\nEEE    NN NNN DD DDD\nEEEEEE NN  NN DDDDD\n###\n");
 
 	// update integral only if we are not landed
 	if (!landed) {
