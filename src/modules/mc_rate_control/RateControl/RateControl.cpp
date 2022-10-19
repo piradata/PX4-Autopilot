@@ -79,7 +79,7 @@ Vector3f RateControl::update(
 	// define gains Kappa, Alpha, Beta and Gamma
 	const Vector3f _gain_kappa(0.26f, 0.26f, 0.08f);
 
-	const Vector3f _gain_alpha(1.0f, 1.0f, 1.3f);
+	const Vector3f _gain_alpha(1.0f, 1.0f, 1.2f);
 	// const Vector3f _gain_beta(0.2f, 0.2f, 0.1f);
 	const Vector3f _gain_gamma(0.006f, 0.006f, 0.0f);
 
@@ -96,9 +96,6 @@ Vector3f RateControl::update(
 	// ));
 
 	// SMC with tanh (PID surface)
-	// const Vector3f torque = _gain_kappa.emult(tanh_v(
-	// 	_gain_alpha.emult(rate_error) + _gain_beta.emult(_rate_int).edivide(_gain_i) - _gain_gamma.emult(angular_accel)
-	// ));
 	const Vector3f torque = _gain_kappa.emult(tanh_v(
 		_gain_alpha.emult(rate_error) + _rate_int - _gain_gamma.emult(angular_accel)
 	));
